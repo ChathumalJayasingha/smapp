@@ -1,4 +1,4 @@
-package com.chathumal.smapp;
+package com.chathumal.smapp.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
