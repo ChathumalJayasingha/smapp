@@ -7,6 +7,7 @@ module com.chathumal.smapp {
     requires java.naming;
     requires mysql.connector.java;
     requires java.sql;
+    requires org.junit.jupiter.api;
 
     opens com.chathumal.smapp.entity to org.hibernate.orm.core;
     opens com.chathumal.smapp.controller to javafx.fxml;
