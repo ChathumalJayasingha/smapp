@@ -22,5 +22,7 @@ module com.chathumal.smapp {
     exports com.chathumal.smapp;
     exports com.chathumal.smapp.controller;
     exports com.chathumal.smapp.entity;
+    exports com.chathumal.smapp.service;
+    exports com.chathumal.smapp.dao;
     exports com.chathumal.smapp.configuration;
 }
