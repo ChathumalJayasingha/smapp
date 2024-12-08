@@ -19,7 +19,7 @@ public class User extends SuperEntity implements Serializable {
     @Column(unique=true)
     private String email;
     private String password;
-    @Column(columnDefinition = "default 0")
+    @Column(columnDefinition = "TINYINT NOT NULL DEFAULT 0")
     private boolean fulacs;
 
     public User(){
