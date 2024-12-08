@@ -132,4 +132,7 @@ public class DashboardController {
         scallpaneFollowdContent.setContent(vBox);
 
     }
+
+    public void onChangePost(Event event) {
+    }
 }

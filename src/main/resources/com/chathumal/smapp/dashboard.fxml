@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextArea?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
@@ -174,6 +176,16 @@
                                  <children>
                                     <ScrollPane fx:id="scallpaneFollowdContent" layoutX="27.0" layoutY="24.0" prefHeight="397.0" prefWidth="1106.0" />
                                  </children></AnchorPane>
+                           </content>
+                        </Tab>
+                        <Tab onSelectionChanged="#onChangePost" text="Post">
+                           <content>
+                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <JFXTextArea layoutX="101.0" layoutY="65.0" prefHeight="196.0" prefWidth="497.0" />
+                                    <JFXButton layoutX="108.0" layoutY="300.0" prefHeight="52.0" prefWidth="148.0" text="Post" />
+                                 </children>
+                              </AnchorPane>
                            </content>
                         </Tab>
                     </tabs>
