@@ -1,5 +1,7 @@
 package com.chathumal.smapp.configuration;
 
+import com.chathumal.smapp.entity.Content;
+import com.chathumal.smapp.entity.Follow;
 import com.chathumal.smapp.entity.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -12,6 +14,8 @@ public class FactoryConfiguration {
     public FactoryConfiguration() {
         Configuration configuration = new Configuration();
         configuration.addAnnotatedClass(User.class);
+        configuration.addAnnotatedClass(Content.class);
+        configuration.addAnnotatedClass(Follow.class);
         sessionFactory = configuration.buildSessionFactory();
     }
 
