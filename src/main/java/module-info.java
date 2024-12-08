@@ -12,6 +12,7 @@ module com.chathumal.smapp {
     requires org.junit.platform.commons;
     requires org.junit.jupiter.engine;
     requires org.junit.platform.engine;
+    requires static lombok;
 
 
     opens com.chathumal.smapp.entity to org.hibernate.orm.core;
