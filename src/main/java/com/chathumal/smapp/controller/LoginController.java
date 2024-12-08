@@ -5,7 +5,6 @@ import com.chathumal.smapp.service.ServiceFactory;
 import com.chathumal.smapp.service.custom.UserService;
 import com.jfoenix.controls.JFXButton;
 import com.chathumal.smapp.HelloApplication;
-import com.chathumal.smapp.service.custom.impl.UserServiceImpl;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import javafx.event.ActionEvent;
@@ -42,7 +41,7 @@ public class LoginController {
             if (user == null) {
                 System.out.println("User not founded");
             } else {
-                if (user.getPassword().trim().equalsIgnoreCase(txtPassword.getText().trim())){
+                if (user.getPassword().equalsIgnoreCase(txtPassword.getText().trim())){
                     Stage window = (Stage) this.root.getScene().getWindow();
                     window.setScene(new Scene(FXMLLoader.load(HelloApplication.class.getResource("dashboard.fxml"))));
                 } else {
