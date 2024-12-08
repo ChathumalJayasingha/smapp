@@ -117,18 +117,6 @@
                <children>
                   <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
                     <tabs>
-                      <Tab text="Notification">
-                        <content>
-                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                 <children>
-                                    <ScrollPane layoutX="29.0" layoutY="25.0" prefHeight="397.0" prefWidth="1106.0">
-                                      <content>
-                                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="396.0" prefWidth="1103.0" />
-                                      </content>
-                                    </ScrollPane>
-                                 </children></AnchorPane>
-                        </content>
-                      </Tab>
                       <Tab text="Account">
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" onMouseClicked="#imgUpdateClick" prefHeight="180.0" prefWidth="200.0">
@@ -172,9 +160,20 @@
                                  </children></AnchorPane>
                         </content>
                       </Tab>
-                        <Tab text="User Handle">
+                      <Tab onSelectionChanged="#notificationOnChange" text="Users">
+                        <content>
+                          <AnchorPane fx:id="notifiMainAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <ScrollPane fx:id="scrallpaneNotifi" layoutX="29.0" layoutY="25.0" prefHeight="397.0" prefWidth="1106.0" />
+                                 </children></AnchorPane>
+                        </content>
+                      </Tab>
+                        <Tab onSelectionChanged="#onChangeFollowingContent" text="FollowingContent">
                            <content>
-                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <ScrollPane fx:id="scallpaneFollowdContent" layoutX="27.0" layoutY="24.0" prefHeight="397.0" prefWidth="1106.0" />
+                                 </children></AnchorPane>
                            </content>
                         </Tab>
                     </tabs>
