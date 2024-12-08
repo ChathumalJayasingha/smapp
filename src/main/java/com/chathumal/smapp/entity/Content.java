@@ -9,9 +9,6 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "content")
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
 public class Content extends SuperEntity implements Serializable {
     @TableGenerator(name="tblcon", initialValue= 50000)
     @Id
@@ -21,4 +18,45 @@ public class Content extends SuperEntity implements Serializable {
     @ManyToOne(targetEntity = User.class)
     private User user;
 
+    public Content() {
+    }
+
+    public Content(int cid, String content, User user) {
+        this.cid = cid;
+        this.content = content;
+        this.user = user;
+    }
+
+    public int getCid() {
+        return cid;
+    }
+
+    public void setCid(int cid) {
+        this.cid = cid;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    @Override
+    public String toString() {
+        return "Content{" +
+                "cid=" + cid +
+                ", content='" + content + '\'' +
+                ", user=" + user +
+                '}';
+    }
 }
