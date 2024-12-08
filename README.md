@@ -17,6 +17,24 @@ These instructions will guide you through setting up the project on your local m
 ```sh
 git clone https://github.com/ChathumalJayasingha/smapp.git
 cd smapp
+```
 
 
+### Setting Up the Database
+
+Move to the src/main/resources directory:
+```sh 
+cd src/main/resources
+```
+
+### Edit the hibernate.properties file with your MySQL credentials:
+
+``` properties
+hibernate.connection.username= root # change 'root' to your MySQL username 
+hibernate.connection.password=your_password # change 'your_password' to your MySQL password
+```
+
+### Authors
+
+Chathumal Jayasinghe
     
