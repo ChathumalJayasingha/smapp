@@ -9,9 +9,14 @@ module com.chathumal.smapp {
     requires java.sql;
     requires org.junit.jupiter.api;
     requires com.jfoenix;
+    requires org.junit.platform.commons;
+    requires org.junit.jupiter.engine;
+    requires org.junit.platform.engine;
+
 
     opens com.chathumal.smapp.entity to org.hibernate.orm.core;
     opens com.chathumal.smapp.controller to javafx.fxml;
+    opens com.chathumal.smapp.dao.custom.impl to org.junit.platform.commons;
 
     exports com.chathumal.smapp;
     exports com.chathumal.smapp.controller;
