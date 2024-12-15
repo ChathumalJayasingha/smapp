@@ -17,15 +17,15 @@ class UserSessionTest  {
     @Test
     void testSetAndGetUsername() {
         UserSession userSession = UserSession.getInstance();
-        String testUsername = "testUser";
-        userSession.setUsername(testUsername);
+        String testEmail = "testUser@gmailcom";
+        userSession.setEmail(testEmail);
 
-        assertEquals(testUsername, userSession.getUsername(), "The retrieved username is incorrect!");
+        assertEquals(testEmail, userSession.getEmail(), "The retrieved email is incorrect!");
     }
 
     @Test
     void testDefaultUsername() {
         UserSession userSession = UserSession.getInstance();
 
-        assertNull(userSession.getUsername(), "Default username is not null!");
+        assertNull(userSession.getEmail(), "Default email is not null!");
     }}
