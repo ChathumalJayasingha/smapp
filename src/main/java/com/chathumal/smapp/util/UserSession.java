@@ -1,8 +1,11 @@
 package com.chathumal.smapp.util;
 
+import com.chathumal.smapp.entity.User;
+
 public class UserSession {
     private static UserSession instance;
     private String email;
+    private User currentUser;
 
     private UserSession() {}
 
@@ -19,5 +22,13 @@ public class UserSession {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    public void setCurrentUser(User currentUser) {
+        this.currentUser = currentUser;
     }
 }
