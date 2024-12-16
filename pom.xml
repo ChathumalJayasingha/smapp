@@ -106,6 +106,12 @@
             <version>5.5.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>5.11.0</version>
+            <scope>compile</scope>
+        </dependency>
 
 
     </dependencies>
@@ -130,6 +136,9 @@
                     <argLine>--add-opens org.junit.platform.commons/org.junit.platform.commons.util=ALL-UNNAMED
                         --add-opens org.junit.platform.commons/org.junit.platform.commons.logging=ALL-UNNAMED
                         --add-opens com.chathumal.smapp/com.chathumal.smapp.entity=org.junit.platform.commons
+                        --add-opens com.chathumal.smapp/com.chathumal.smapp.service.custom.impl=org.junit.platform.commons,org.mockito
+                        --add-opens com.chathumal.smapp/com.chathumal.smapp.util=org.junit.platform.commons
+
                     </argLine>
                 </configuration>
             </plugin>
