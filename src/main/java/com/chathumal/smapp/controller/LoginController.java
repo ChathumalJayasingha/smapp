@@ -1,22 +1,22 @@
 package com.chathumal.smapp.controller;
 
 import com.chathumal.smapp.entity.User;
+import com.chathumal.smapp.exception.ExceptionHandlerUtil;
 import com.chathumal.smapp.service.ServiceFactory;
 import com.chathumal.smapp.service.custom.UserService;
+import com.chathumal.smapp.util.AlertUtil;
+import com.chathumal.smapp.util.UserSession;
+import com.chathumal.smapp.util.ValidationUtil;
 import com.jfoenix.controls.JFXButton;
 import com.chathumal.smapp.HelloApplication;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 
 public class LoginController {
     public AnchorPane root;
@@ -26,32 +26,34 @@ public class LoginController {
     public JFXPasswordField txtPassword;
 
     public void loginOnClick(ActionEvent actionEvent) {
-
         UserService service = (UserService) ServiceFactory.getInstance().getService(ServiceFactory.Type.USER);
-
+        String email = txtEmail.getText().trim();
+        String password = txtPassword.getText().trim();
         try {
-//            service.addUser("admin","No","0760840801","edu@chathumal.com","test@123");
-            if (txtEmail.getText().trim().length() < 4 || txtEmail.getText() == null ) {
-                System.out.println("Enter valid email");
+            if (!ValidationUtil.isValidEmail(email)) {
+                AlertUtil.showErrorAlert("Invalid Email", "Please enter a valid email address.");
+                return;
             }
-            if (txtPassword.getText().trim().length() < 4 ||  txtPassword.getText() == null) {
-                System.out.println("Enter valid Password");
+            if (!ValidationUtil.isValidPassword(password)) {
+                AlertUtil.showErrorAlert("Invalid Password", "Password must be at least 4 characters long.");
+                return;
             }
-            User user = service.loginCheck(txtEmail.getText().trim(), txtPassword.getText().trim());
+            User user = service.findByEmail(email);
             if (user == null) {
-                System.out.println("User not founded");
-            } else {
-                if (user.getPassword().equalsIgnoreCase(txtPassword.getText().trim())){
-                    Stage window = (Stage) this.root.getScene().getWindow();
-                    window.setScene(new Scene(FXMLLoader.load(HelloApplication.class.getResource("dashboard.fxml"))));
-                } else {
-                    System.out.println("Wrong Password");
-
-                }
+                AlertUtil.showErrorAlert("User Not Found", "No user found with the provided email.");
+                return;
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+            if (!user.getPassword().equalsIgnoreCase(password)) {
+                AlertUtil.showErrorAlert("Incorrect Password", "The password you entered is incorrect.");
+                return;
+            }
+            UserSession instance = UserSession.getInstance();
+            instance.setEmail(email);
+            Stage window = (Stage) this.root.getScene().getWindow();
+            window.setScene(new Scene(FXMLLoader.load(HelloApplication.class.getResource("dashboard.fxml"))));
 
+        } catch (Exception e) {
+            ExceptionHandlerUtil.handleException("Login Error", "An error occurred during login", e);
+        }
     }
 }
