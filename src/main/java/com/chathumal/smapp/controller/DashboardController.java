@@ -19,11 +19,14 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.util.List;
@@ -55,6 +58,7 @@ public class DashboardController {
     public Button btnPublishPost;
     public TextArea txtCreatePost;
     public ScrollPane scrollPanePost;
+    public ScrollPane scrollPaneAllUsers;
     UserService userService = (UserService) ServiceFactory.getInstance().getService(ServiceFactory.Type.USER);
 
     public void imgLogoutOnClick(MouseEvent mouseEvent) {
@@ -77,7 +81,7 @@ public class DashboardController {
             if (user != null) {
                 updateProfileFields(user);
                 boolean fulacs = user.isFulacs();
-                if (fulacs){
+                if (fulacs) {
                     lblIsAdmin.setText("Admin User");
                     tabCreateUser.setDisable(false);
                 } else {
@@ -94,6 +98,132 @@ public class DashboardController {
             ExceptionHandlerUtil.handleException("Error", "An error occurred while loading user profile", e);
         }
         loadPersonPost();
+        loadAllUsers();
+    }
+
+    private void loadAllUsers() {
+        scrollPaneAllUsers.setContent(null);
+        List<User> userList = null;
+        UserService userService = (UserService) ServiceFactory.getInstance().getService(ServiceFactory.Type.USER);
+        try {
+            userList = userService.findAllUsers();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
+        VBox vBox = new VBox(20);
+        final Random rng = new Random();
+        scrollPaneAllUsers.setFitToWidth(true);
+        scrollPaneAllUsers.setFitToHeight(true);
+        for (int i = 0; i < userList.size(); i++) {
+            AnchorPane anchorPane = new AnchorPane();
+            anchorPane.setId(userList.get(i).getEmail());
+            String style = String.format("-fx-background: rgb(%d, %d, %d); " +
+                            "-fx-background-color: -fx-background;", rng.nextInt(256),
+                    rng.nextInt(256),
+                    rng.nextInt(256));
+            //anchorPane.setStyle(style);
+            anchorPane.setStyle("-fx-padding: 5px; -fx-border-color: #808080; -fx-border-radius: 3px; -fx-background-color: rgba(68,68,68,0.18)");
+            Label label = new Label("User " + userList.get(i).getName() + (vBox.getChildren().size() + 1));
+            anchorPane.setLeftAnchor(label, 5.0);
+            anchorPane.setTopAnchor(label, 5.0);
+
+            Label address = new Label(userList.get(i).getAddress() + (vBox.getChildren().size() + 1));
+            anchorPane.setLeftAnchor(address, 100.0);
+            anchorPane.setTopAnchor(address, 5.0);
+
+            JFXButton button = new JFXButton("View");
+            button.setStyle("-fx-background-color: white");
+            button.setOnAction(
+                    (event) -> {
+                        System.out.println("test");
+                        System.out.println("anchorPane = " + anchorPane.getId());
+                        System.out.println("anchorPane = " + anchorPane.getChildren());
+                        try {
+                            User byEmail = userService.findByEmail(anchorPane.getId());
+                            Stage popupStage = new Stage();
+                            popupStage.setTitle("Update User Form");
+                            popupStage.initModality(Modality.WINDOW_MODAL);
+                            popupStage.initOwner(new Stage());
+
+                            GridPane gridPane = new GridPane();
+                            gridPane.setAlignment(Pos.CENTER);
+                            gridPane.setPadding(new Insets(20));
+                            gridPane.setHgap(10);
+                            gridPane.setVgap(10);
+
+                            Label lblId = new Label("Id");
+                            TextField txtId = new TextField();
+                            txtId.setText(String.valueOf(byEmail.getId()));
+                            txtId.setDisable(true);
+                            Label lblName = new Label("Name");
+                            TextField txtName = new TextField();
+                            txtName.setText(byEmail.getName());
+                            Label lblAddress = new Label("Address");
+                            TextField txtAddress = new TextField();
+                            txtAddress.setText(byEmail.getAddress());
+                            Label lblMobile = new Label("Mobile Number");
+                            TextField txtMobile = new TextField();
+                            txtMobile.setText(byEmail.getContact());
+                            Label lblEmail = new Label("Email");
+                            TextField txtEmail = new TextField();
+                            txtEmail.setText(byEmail.getEmail());
+                            Label lblPassword = new Label("Password");
+                            TextField txtPassword = new TextField();
+                            txtPassword.setText(byEmail.getPassword());
+                            Button update = new Button("Update User");
+                            gridPane.add(lblName, 0, 0);
+                            gridPane.add(txtName, 1, 0);
+                            gridPane.add(lblAddress, 0, 1);
+                            gridPane.add(txtAddress, 1, 1);
+                            gridPane.add(lblMobile, 0, 2);
+                            gridPane.add(txtMobile, 1, 2);
+                            gridPane.add(lblEmail, 0, 3);
+                            gridPane.add(txtEmail, 1, 3);
+                            gridPane.add(lblPassword, 0, 4);
+                            gridPane.add(txtPassword, 1, 4);
+                            gridPane.add(lblId, 0, 5);
+                            gridPane.add(txtId, 1, 5);
+                            gridPane.add(update, 0, 6);
+
+
+                            update.setOnAction(event1 -> {
+                                boolean confirmUpdate = AlertUtil.showConfirmationAlert("Confirm", "Did you want to really create new account");
+                                if (confirmUpdate) {
+                                    try {
+                                        userService.updateUser(Integer.valueOf(txtId.getText()),txtName.getText(), txtAddress.getText(),
+                                                txtMobile.getText(), txtEmail.getText(), txtPassword.getText(), false);
+
+                                            AlertUtil.showInfoAlert("Success", "User update successful");
+
+                                    } catch (DuplicateEntryException e) {
+                                        ExceptionHandlerUtil.handleException("Error", "An error occurred while updating the user profile", e);
+                                    } catch (Exception e) {
+                                        ExceptionHandlerUtil.handleException("Error", "An error occurred while updating the user profile", e);
+                                    }
+                                } else {
+                                    AlertUtil.showErrorAlert("Failed", "Update failed");
+                                }
+                            });
+
+
+                            Scene popupScene = new Scene(gridPane, 400, 300);
+                            popupStage.setScene(popupScene);
+                            popupStage.showAndWait();
+
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+            );
+            AnchorPane.setRightAnchor(button, 5.0);
+            anchorPane.setTopAnchor(button, 5.0);
+            anchorPane.setBottomAnchor(button, 5.0);
+            anchorPane.getChildren().addAll(label, address, button);
+            vBox.getChildren().add(anchorPane);
+        }
+        scrollPaneAllUsers.setContent(vBox);
     }
 
     private User getUserByEmail(String email) throws NotFoundException, Exception {
@@ -197,9 +327,9 @@ public class DashboardController {
     public void onChangePost(Event event) {
     }
 
-    public void loadPersonPost(){
+    public void loadPersonPost() {
         scrollPanePost.setContent(null);
-        List<Content> content=null;
+        List<Content> content = null;
         ContentService contentService = (ContentService) ServiceFactory.getInstance().getService(ServiceFactory.Type.CONTENT);
         try {
             content = contentService.findContent(UserSession.getInstance().getCurrentUser());
@@ -220,7 +350,7 @@ public class DashboardController {
                     rng.nextInt(256));
             //anchorPane.setStyle(style);
             anchorPane.setStyle("-fx-padding: 5px; -fx-border-color: #808080; -fx-border-radius: 3px; -fx-background-color: rgba(68,68,68,0.18)");
-            Label label = new Label("My Post " +content.get(i).getCid() + (vBox.getChildren().size() + 1));
+            Label label = new Label("My Post " + content.get(i).getCid() + (vBox.getChildren().size() + 1));
             anchorPane.setLeftAnchor(label, 5.0);
             anchorPane.setTopAnchor(label, 5.0);
 
@@ -262,6 +392,16 @@ public class DashboardController {
         } else {
             AlertUtil.showErrorAlert("Failed", "Update failed");
         }
+        clearNewUserAddingFiled();
+
+    }
+
+    void clearNewUserAddingFiled() {
+        txtCreateUserEmail.clear();
+        txtCreateUserPassword.clear();
+        txtCreateUserMobile.clear();
+        txtCreateUserName.clear();
+        txtCreateUserAddress.clear();
     }
 
     public void btnUpdateOnAction(ActionEvent actionEvent) {
@@ -314,6 +454,7 @@ public class DashboardController {
         }
         return true;
     }
+
     private boolean isValidEmail() {
         String email = txtEmail.getText().trim();
         if (email.isEmpty() || !ValidationUtil.isValidEmail(email)) {
@@ -351,7 +492,6 @@ public class DashboardController {
     }
 
 
-
     private boolean isValidAddress() {
         String address = txtAddress.getText().trim();
         if (address.isEmpty()) {
@@ -360,6 +500,7 @@ public class DashboardController {
         }
         return true;
     }
+
     private boolean isValidAddressNewUser() {
         String address = txtCreateUserAddress.getText().trim();
         if (address.isEmpty()) {
