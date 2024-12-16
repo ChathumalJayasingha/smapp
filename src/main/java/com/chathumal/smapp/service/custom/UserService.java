@@ -3,8 +3,11 @@ package com.chathumal.smapp.service.custom;
 import com.chathumal.smapp.entity.User;
 
 public interface UserService {
-    void addUser(String name, String address, String contact, String email, String password) throws Exception;
-    User loginCheck(String email, String password) throws Exception;
+    boolean addUser(String name, String address, String contact, String email, String password, boolean fulacs) throws Exception;
+
+    void updateUser(Integer id, String name, String address, String contact, String email, String password, boolean fulacs) throws Exception;
+
+    User findByEmail(String email) throws Exception;
 
 
 }
