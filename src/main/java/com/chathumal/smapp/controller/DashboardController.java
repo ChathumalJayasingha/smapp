@@ -1,11 +1,15 @@
 package com.chathumal.smapp.controller;
 
 import com.chathumal.smapp.HelloApplication;
+import com.chathumal.smapp.entity.Content;
 import com.chathumal.smapp.entity.User;
+import com.chathumal.smapp.exception.DuplicateEntryException;
 import com.chathumal.smapp.exception.ExceptionHandlerUtil;
 import com.chathumal.smapp.exception.NotFoundException;
 import com.chathumal.smapp.service.ServiceFactory;
+import com.chathumal.smapp.service.custom.ContentService;
 import com.chathumal.smapp.service.custom.UserService;
+import com.chathumal.smapp.service.custom.impl.ContentServiceImpl;
 import com.chathumal.smapp.util.AlertUtil;
 import com.chathumal.smapp.util.UserSession;
 import com.chathumal.smapp.util.ValidationUtil;
@@ -22,21 +26,35 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
+import java.util.List;
 import java.util.Random;
 
 public class DashboardController {
     public AnchorPane root;
     public ImageView imgLogout;
-    public JFXTextField txtName;
-    public JFXTextField txtEmail;
-    public JFXTextField txtMobile;
-    public JFXTextField txtAddress;
-    public JFXTextField txtUserId;
+    public TextField txtName;
+    public TextField txtEmail;
+    public TextField txtMobile;
+    public TextField txtAddress;
+    public TextField txtUserId;
+    public TextField txtPassword;
     public ScrollPane scrallpaneNotifi;
     public AnchorPane notifiMainAnchorPane;
     public ScrollPane scallpaneFollowdContent;
     public Button btnUpdate;
-    public JFXTextField txtPassword;
+    public Label lblIsAdmin;
+    public Tab tabCreateUser;
+    public TextField txtCreateUserName;
+    public TextField txtCreateUserEmail;
+    public TextField txtCreateUserMobile;
+    public TextField txtCreateUserAddress;
+    public TextField txtCreateUserPassword;
+    public Button btnCreateNewUser;
+    public CheckBox chkboxAdmAccess;
+    public AnchorPane postAnchor;
+    public Button btnPublishPost;
+    public TextArea txtCreatePost;
+    public ScrollPane scrollPanePost;
     UserService userService = (UserService) ServiceFactory.getInstance().getService(ServiceFactory.Type.USER);
 
     public void imgLogoutOnClick(MouseEvent mouseEvent) {
@@ -58,6 +76,15 @@ public class DashboardController {
             User user = getUserByEmail(userEmail);
             if (user != null) {
                 updateProfileFields(user);
+                boolean fulacs = user.isFulacs();
+                if (fulacs){
+                    lblIsAdmin.setText("Admin User");
+                    tabCreateUser.setDisable(false);
+                } else {
+                    lblIsAdmin.setText("Normal User");
+                    tabCreateUser.setDisable(true);
+                }
+                UserSession.getInstance().setCurrentUser(user);
             } else {
                 AlertUtil.showErrorAlert("User Not Found", "No user found with the provided email.");
             }
@@ -66,6 +93,7 @@ public class DashboardController {
         } catch (Exception e) {
             ExceptionHandlerUtil.handleException("Error", "An error occurred while loading user profile", e);
         }
+        loadPersonPost();
     }
 
     private User getUserByEmail(String email) throws NotFoundException, Exception {
@@ -169,6 +197,73 @@ public class DashboardController {
     public void onChangePost(Event event) {
     }
 
+    public void loadPersonPost(){
+        scrollPanePost.setContent(null);
+        List<Content> content=null;
+        ContentService contentService = (ContentService) ServiceFactory.getInstance().getService(ServiceFactory.Type.CONTENT);
+        try {
+            content = contentService.findContent(UserSession.getInstance().getCurrentUser());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
+        VBox vBox = new VBox(20);
+        final Random rng = new Random();
+        scrollPanePost.setFitToWidth(true);
+        scrollPanePost.setFitToHeight(true);
+        for (int i = 0; i < content.size(); i++) {
+            AnchorPane anchorPane = new AnchorPane();
+            String style = String.format("-fx-background: rgb(%d, %d, %d); " +
+                            "-fx-background-color: -fx-background;", rng.nextInt(256),
+                    rng.nextInt(256),
+                    rng.nextInt(256));
+            //anchorPane.setStyle(style);
+            anchorPane.setStyle("-fx-padding: 5px; -fx-border-color: #808080; -fx-border-radius: 3px; -fx-background-color: rgba(68,68,68,0.18)");
+            Label label = new Label("My Post " +content.get(i).getCid() + (vBox.getChildren().size() + 1));
+            anchorPane.setLeftAnchor(label, 5.0);
+            anchorPane.setTopAnchor(label, 5.0);
+
+            Label address = new Label(content.get(i).getContent() + (vBox.getChildren().size() + 1));
+            anchorPane.setLeftAnchor(address, 100.0);
+            anchorPane.setTopAnchor(address, 5.0);
+
+            JFXButton button = new JFXButton("Remove");
+            button.setStyle("-fx-background-color: white");
+            button.setOnAction(evt -> vBox.getChildren().remove(anchorPane));
+            AnchorPane.setRightAnchor(button, 5.0);
+            anchorPane.setTopAnchor(button, 5.0);
+            anchorPane.setBottomAnchor(button, 5.0);
+            anchorPane.getChildren().addAll(label, address, button);
+            vBox.getChildren().add(anchorPane);
+        }
+        scrollPanePost.setContent(vBox);
+    }
+
+    public void btnCreateNewUserOnAction(ActionEvent actionEvent) {
+        boolean confirmUpdate = AlertUtil.showConfirmationAlert("Confirm", "Did you want to really create new account");
+        if (confirmUpdate) {
+            if (isValidUpdateNewUser()) {
+                try {
+                    boolean b = userService.addUser(txtCreateUserName.getText(), txtCreateUserAddress.getText(), txtCreateUserMobile.getText(), txtCreateUserEmail.getText(), txtCreateUserPassword.getText(), chkboxAdmAccess.isSelected());
+                    if (b) {
+                        AlertUtil.showInfoAlert("Success", "User Create successful");
+                    } else {
+                        AlertUtil.showWarningAlert("Failed", "User creation failed");
+                    }
+                } catch (DuplicateEntryException e) {
+                    ExceptionHandlerUtil.handleException("Error", "An error occurred while updating the user profile", e);
+                } catch (Exception e) {
+                    ExceptionHandlerUtil.handleException("Error", "An error occurred while updating the user profile", e);
+                }
+            } else {
+                AlertUtil.showErrorAlert("Invalid Input", "Please ensure all fields are valid before updating.");
+            }
+        } else {
+            AlertUtil.showErrorAlert("Failed", "Update failed");
+        }
+    }
+
     public void btnUpdateOnAction(ActionEvent actionEvent) {
         boolean confirmUpdate = AlertUtil.showConfirmationAlert("Confirm", "Did you want to really update your account details");
         if (confirmUpdate) {
@@ -198,6 +293,10 @@ public class DashboardController {
         return isValidName() && isValidEmail() && isValidPassword() && isValidAddress() && isValidMobile();
     }
 
+    private boolean isValidUpdateNewUser() {
+        return isValidNameNewUser() && isValidEmailNewUser() && isValidPasswordNewUser() && isValidAddressNewUser() && isValidMobileNewUser();
+    }
+
     private boolean isValidName() {
         String name = txtName.getText().trim();
         if (name.isEmpty()) {
@@ -207,8 +306,25 @@ public class DashboardController {
         return true;
     }
 
+    private boolean isValidNameNewUser() {
+        String name = txtCreateUserName.getText().trim();
+        if (name.isEmpty()) {
+            AlertUtil.showErrorAlert("Invalid Name", "Name cannot be empty.");
+            return false;
+        }
+        return true;
+    }
     private boolean isValidEmail() {
         String email = txtEmail.getText().trim();
+        if (email.isEmpty() || !ValidationUtil.isValidEmail(email)) {
+            AlertUtil.showErrorAlert("Invalid Email", "Please enter a valid email address.");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isValidEmailNewUser() {
+        String email = txtCreateUserEmail.getText().trim();
         if (email.isEmpty() || !ValidationUtil.isValidEmail(email)) {
             AlertUtil.showErrorAlert("Invalid Email", "Please enter a valid email address.");
             return false;
@@ -225,8 +341,27 @@ public class DashboardController {
         return true;
     }
 
+    private boolean isValidPasswordNewUser() {
+        String password = txtCreateUserPassword.getText().trim();
+        if (password.isEmpty() || password.length() < 6) {
+            AlertUtil.showErrorAlert("Invalid Password", "Password must be at least 6 characters long.");
+            return false;
+        }
+        return true;
+    }
+
+
+
     private boolean isValidAddress() {
         String address = txtAddress.getText().trim();
+        if (address.isEmpty()) {
+            AlertUtil.showErrorAlert("Invalid Address", "Address cannot be empty.");
+            return false;
+        }
+        return true;
+    }
+    private boolean isValidAddressNewUser() {
+        String address = txtCreateUserAddress.getText().trim();
         if (address.isEmpty()) {
             AlertUtil.showErrorAlert("Invalid Address", "Address cannot be empty.");
             return false;
@@ -243,5 +378,34 @@ public class DashboardController {
         return true;
     }
 
+    private boolean isValidMobileNewUser() {
+        String mobile = txtCreateUserMobile.getText().trim();
+        if (mobile.isEmpty() || !ValidationUtil.isValidMobile(mobile)) {
+            AlertUtil.showErrorAlert("Invalid Mobile", "Please enter a valid mobile number.");
+            return false;
+        }
+        return true;
+    }
 
+
+    public void onChangeCreateUserTab(Event event) {
+    }
+
+
+    public void btnPublishPostOnAction(ActionEvent actionEvent) {
+        String createPostText = txtCreatePost.getText();
+        ContentService contentService = (ContentService) ServiceFactory.getInstance().getService(ServiceFactory.Type.CONTENT);
+        try {
+            boolean b = contentService.addContent(UserSession.getInstance().getCurrentUser(), createPostText);
+            if (b) {
+                AlertUtil.showInfoAlert("User Content", "Content Added Success");
+            } else {
+                AlertUtil.showErrorAlert("User Content", "Content Added Successfully");
+            }
+            txtCreatePost.clear();
+            loadPersonPost();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
