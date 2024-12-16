@@ -12,12 +12,15 @@ module com.chathumal.smapp {
     requires org.junit.platform.commons;
     requires org.junit.jupiter.engine;
     requires org.junit.platform.engine;
+    requires org.mockito;
     requires static lombok;
 
 
     opens com.chathumal.smapp.entity to org.hibernate.orm.core;
     opens com.chathumal.smapp.controller to javafx.fxml;
     opens com.chathumal.smapp.dao.custom.impl to org.junit.platform.commons;
+    opens com.chathumal.smapp.util to org.junit.platform.commons, org.mockito;
+
 
     exports com.chathumal.smapp;
     exports com.chathumal.smapp.controller;
