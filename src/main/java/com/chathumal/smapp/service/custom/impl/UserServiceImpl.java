@@ -12,6 +12,7 @@ import org.hibernate.Transaction;
 import org.hibernate.exception.ConstraintViolationException;
 
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.List;
 
 public class UserServiceImpl implements UserService {
 
@@ -91,5 +92,25 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+
+    @Override
+    public List<User> findAllUsers() throws Exception {
+        Transaction transaction = null;
+        Session session = null;
+        List<User> userList= null;
+        try {
+            session = FactoryConfiguration.getInstance().getSession();
+            userDAO.setSession(session);
+            transaction = session.beginTransaction();
+            userList = userDAO.getAll();
+            return userList;
+        } catch (Exception e) {
+            transaction.rollback();
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+        return null;
+    }
 
 }
