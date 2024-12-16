@@ -22,4 +22,13 @@ public class ValidationUtil {
         }
         return password.trim().length() >= 4;
     }
+
+
+    public static boolean isValidMobile(String mobile) {
+        if (mobile == null || mobile.trim().isEmpty()) {
+            return false;
+        }
+        String mobileRegex = "^0\\d{9}$";
+        return mobile.matches(mobileRegex);
+    }
 }
