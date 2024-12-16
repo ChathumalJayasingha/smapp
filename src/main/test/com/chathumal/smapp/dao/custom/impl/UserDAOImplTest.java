@@ -2,6 +2,7 @@ package com.chathumal.smapp.dao.custom.impl;
 
 import com.chathumal.smapp.configuration.FactoryConfiguration;
 import com.chathumal.smapp.entity.User;
+import com.chathumal.smapp.exception.NotFoundException;
 import org.hibernate.Session;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +35,7 @@ public class UserDAOImplTest {
     }
 
     @Test
-    void findByEmail() {
+    void findByEmail() throws NotFoundException {
         String emailToFind = "edu@chathumal.com";
 
         User userToSave = new User(0, "Admin", "Padukka", "0765042201", emailToFind, "test@123", true);
