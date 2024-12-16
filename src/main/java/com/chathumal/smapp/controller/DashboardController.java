@@ -125,21 +125,18 @@ public class DashboardController {
                     rng.nextInt(256));
             //anchorPane.setStyle(style);
             anchorPane.setStyle("-fx-padding: 5px; -fx-border-color: #808080; -fx-border-radius: 3px; -fx-background-color: rgba(68,68,68,0.18)");
-            Label label = new Label("User " + userList.get(i).getName() + (vBox.getChildren().size() + 1));
+            Label label = new Label(userList.get(i).getId()+" : "+userList.get(i).getName() +" : "+userList.get(i).getEmail());
             anchorPane.setLeftAnchor(label, 5.0);
             anchorPane.setTopAnchor(label, 5.0);
 
-            Label address = new Label(userList.get(i).getAddress() + (vBox.getChildren().size() + 1));
-            anchorPane.setLeftAnchor(address, 100.0);
-            anchorPane.setTopAnchor(address, 5.0);
+//            Label address = new Label(userList.get(i).getAddress() + (vBox.getChildren().size() + 1));
+//            anchorPane.setLeftAnchor(address, 100.0);
+//            anchorPane.setTopAnchor(address, 5.0);
 
             JFXButton button = new JFXButton("View");
             button.setStyle("-fx-background-color: white");
             button.setOnAction(
                     (event) -> {
-                        System.out.println("test");
-                        System.out.println("anchorPane = " + anchorPane.getId());
-                        System.out.println("anchorPane = " + anchorPane.getChildren());
                         try {
                             User byEmail = userService.findByEmail(anchorPane.getId());
                             Stage popupStage = new Stage();
@@ -173,6 +170,8 @@ public class DashboardController {
                             TextField txtPassword = new TextField();
                             txtPassword.setText(byEmail.getPassword());
                             Button update = new Button("Update User");
+                            CheckBox checkBox = new CheckBox("Admin access");
+                            checkBox.setSelected(byEmail.isFulacs());
                             gridPane.add(lblName, 0, 0);
                             gridPane.add(txtName, 1, 0);
                             gridPane.add(lblAddress, 0, 1);
@@ -186,26 +185,30 @@ public class DashboardController {
                             gridPane.add(lblId, 0, 5);
                             gridPane.add(txtId, 1, 5);
                             gridPane.add(update, 0, 6);
+                            gridPane.add(checkBox, 1, 6);
 
 
                             update.setOnAction(event1 -> {
-                                boolean confirmUpdate = AlertUtil.showConfirmationAlert("Confirm", "Did you want to really create new account");
+                                boolean confirmUpdate = AlertUtil.showConfirmationAlert("Confirm", "Did you want to really update account");
                                 if (confirmUpdate) {
                                     try {
                                         userService.updateUser(Integer.valueOf(txtId.getText()),txtName.getText(), txtAddress.getText(),
-                                                txtMobile.getText(), txtEmail.getText(), txtPassword.getText(), false);
+                                                txtMobile.getText(), txtEmail.getText(), txtPassword.getText(), checkBox.isSelected());
 
                                             AlertUtil.showInfoAlert("Success", "User update successful");
+
 
                                     } catch (DuplicateEntryException e) {
                                         ExceptionHandlerUtil.handleException("Error", "An error occurred while updating the user profile", e);
                                     } catch (Exception e) {
                                         ExceptionHandlerUtil.handleException("Error", "An error occurred while updating the user profile", e);
                                     }
+                                    popupStage.close();
                                 } else {
                                     AlertUtil.showErrorAlert("Failed", "Update failed");
                                 }
                             });
+
 
 
                             Scene popupScene = new Scene(gridPane, 400, 300);
@@ -220,7 +223,8 @@ public class DashboardController {
             AnchorPane.setRightAnchor(button, 5.0);
             anchorPane.setTopAnchor(button, 5.0);
             anchorPane.setBottomAnchor(button, 5.0);
-            anchorPane.getChildren().addAll(label, address, button);
+            anchorPane.getChildren().addAll(label, button);
+            //anchorPane.getChildren().addAll(label, address, button);
             vBox.getChildren().add(anchorPane);
         }
         scrollPaneAllUsers.setContent(vBox);
