@@ -13,9 +13,10 @@ public class Content extends SuperEntity implements Serializable {
     @TableGenerator(name="tblcon", initialValue= 50000)
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator="tblcon")
-    private int cid;
+    private Integer cid;
     private String content;
     @ManyToOne(targetEntity = User.class)
+    @JoinColumn(name = "user_id", unique = false, nullable = false)
     private User user;
 
     public Content() {
