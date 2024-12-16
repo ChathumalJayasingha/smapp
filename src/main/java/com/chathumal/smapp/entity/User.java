@@ -10,9 +10,6 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "user")
-//@AllArgsConstructor
-//@NoArgsConstructor
-//@Data
 public class User extends SuperEntity implements Serializable {
     @TableGenerator(name="tbl", initialValue= 20000)
     @Id

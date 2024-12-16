@@ -1,9 +1,7 @@
 package com.chathumal.smapp.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
 
 import java.io.Serializable;
 
@@ -14,11 +12,11 @@ public class Follow extends SuperEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator="tblflw")
     private int fid;
-    @OneToOne(targetEntity = User.class)
-    @JoinColumn(name = "user",unique = false)
+    @ManyToOne(targetEntity = User.class)
+    @JoinColumn(name = "user_id",unique = false, nullable = false)
     private User user;
     @ManyToOne(targetEntity = User.class)
-    @JoinColumn(name = "follow", unique = false)
+    @JoinColumn(name = "flwr_id", unique = false, nullable = false)
     private User flwusr;
 
     public Follow() {
