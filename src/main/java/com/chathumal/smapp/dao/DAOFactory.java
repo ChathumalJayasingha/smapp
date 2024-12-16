@@ -1,5 +1,6 @@
 package com.chathumal.smapp.dao;
 
+import com.chathumal.smapp.dao.custom.impl.ContentDAOImpl;
 import com.chathumal.smapp.dao.custom.impl.UserDAOImpl;
 
 public class DAOFactory {
@@ -13,7 +14,7 @@ public class DAOFactory {
     }
 
     public enum Type {
-        USER
+        USER,CONTENT
 
     }
 
@@ -21,6 +22,8 @@ public class DAOFactory {
         switch (type) {
             case USER:
                 return new UserDAOImpl();
+            case CONTENT:
+                return new ContentDAOImpl();
             default:
                 return null;
         }
