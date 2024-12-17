@@ -2,6 +2,7 @@ package com.chathumal.smapp.controller;
 
 import com.chathumal.smapp.HelloApplication;
 import com.chathumal.smapp.dto.FollowerDTO;
+import com.chathumal.smapp.dto.FollowingAndUnfollowingDTO;
 import com.chathumal.smapp.entity.Content;
 import com.chathumal.smapp.entity.User;
 import com.chathumal.smapp.exception.DuplicateEntryException;
@@ -62,6 +63,7 @@ public class DashboardController {
     public TextArea txtCreatePost;
     public ScrollPane scrollPanePost;
     public ScrollPane scrollPaneAllUsers;
+    public ScrollPane scrollpaneListOfUsers;
     UserService userService = (UserService) ServiceFactory.getInstance().getService(ServiceFactory.Type.USER);
 
     public void imgLogoutOnClick(MouseEvent mouseEvent) {
@@ -249,37 +251,53 @@ public class DashboardController {
     }
 
     public void notificationOnChange(Event event) {
-        System.out.println("Notification ON CHANGE");
+
+        scrollpaneListOfUsers.setContent(null);
+        List<FollowingAndUnfollowingDTO> followerDTOS = null;
+        UserService userService = (UserService) ServiceFactory.getInstance().getService(ServiceFactory.Type.USER);
+        try {
+            followerDTOS = userService.findByFollowedAndUnFollowedUser(String.valueOf(UserSession.getInstance().getCurrentUser().getId()));
+        } catch (NotFoundException e) {
+            AlertUtil.showErrorAlert("Not founded","Following content not found");
+        }
+
+
 
         VBox vBox = new VBox(20);
         final Random rng = new Random();
-        scrallpaneNotifi.setFitToWidth(true);
-        scrallpaneNotifi.setFitToHeight(true);
-        for (int i = 0; i < 10; i++) {
-            AnchorPane anchorPane = new AnchorPane();
-            String style = String.format("-fx-background: rgb(%d, %d, %d); " +
-                            "-fx-background-color: -fx-background;", rng.nextInt(256),
-                    rng.nextInt(256),
-                    rng.nextInt(256));
-            anchorPane.setStyle(style);
-            Label label = new Label("User " + (vBox.getChildren().size() + 1));
-            anchorPane.setLeftAnchor(label, 5.0);
-            anchorPane.setTopAnchor(label, 5.0);
+        scrollpaneListOfUsers.setFitToWidth(true);
+        scrollpaneListOfUsers.setFitToHeight(true);
+        if (followerDTOS != null) {
+            for (int i = 0; i < followerDTOS.size(); i++) {
+                AnchorPane anchorPane = new AnchorPane();
+                String style = String.format("-fx-background: rgb(%d, %d, %d); " +
+                                "-fx-background-color: -fx-background;", rng.nextInt(256),
+                        rng.nextInt(256),
+                        rng.nextInt(256));
+                //anchorPane.setStyle(style);
+                Label label = new Label(followerDTOS.get(i).getName()+ " "+followerDTOS.get(i).getEmail());
+                anchorPane.setLeftAnchor(label, 5.0);
+                anchorPane.setTopAnchor(label, 5.0);
+                JFXButton button = new JFXButton();
+                String following = followerDTOS.get(i).getFollowing();
 
-            Label address = new Label("Address " + (vBox.getChildren().size() + 1));
-            anchorPane.setLeftAnchor(address, 100.0);
-            anchorPane.setTopAnchor(address, 5.0);
+                if (following.equalsIgnoreCase("true")){
+                    button.setText("Unfollow");
+                } else {
+                    button.setText("follow");
+                }
+                button.setStyle("-fx-background-color: white");
+                button.setOnMouseClicked(mouseEvent -> {
 
-            JFXButton button = new JFXButton("Follow");
-            button.setStyle("-fx-background-color: white");
-            button.setOnAction(evt -> vBox.getChildren().remove(anchorPane));
-            AnchorPane.setRightAnchor(button, 5.0);
-            anchorPane.setTopAnchor(button, 5.0);
-            anchorPane.setBottomAnchor(button, 5.0);
-            anchorPane.getChildren().addAll(label, address, button);
-            vBox.getChildren().add(anchorPane);
+                });
+                AnchorPane.setRightAnchor(button, 5.0);
+                anchorPane.setTopAnchor(button, 5.0);
+                anchorPane.setBottomAnchor(button, 5.0);
+                anchorPane.getChildren().addAll(label, button);
+                vBox.getChildren().add(anchorPane);
+            }
+            scrollpaneListOfUsers.setContent(vBox);
         }
-        scrallpaneNotifi.setContent(vBox);
 
     }
 

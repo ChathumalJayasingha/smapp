@@ -3,6 +3,7 @@ package com.chathumal.smapp.service.custom.impl;
 import com.chathumal.smapp.configuration.FactoryConfiguration;
 import com.chathumal.smapp.dao.DAOFactory;
 import com.chathumal.smapp.dao.custom.UserDAO;
+import com.chathumal.smapp.dto.FollowingAndUnfollowingDTO;
 import com.chathumal.smapp.entity.User;
 import com.chathumal.smapp.exception.DuplicateEntryException;
 import com.chathumal.smapp.exception.NotFoundException;
@@ -103,6 +104,27 @@ public class UserServiceImpl implements UserService {
             userDAO.setSession(session);
             transaction = session.beginTransaction();
             userList = userDAO.getAll();
+            return userList;
+        } catch (Exception e) {
+            transaction.rollback();
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+        return null;
+    }
+
+    @Override
+    public List<FollowingAndUnfollowingDTO> findByFollowedAndUnFollowedUser(String userId) throws NotFoundException {
+        Transaction transaction = null;
+        Session session = null;
+        List<FollowingAndUnfollowingDTO> userList= null;
+        try {
+            session = FactoryConfiguration.getInstance().getSession();
+            userDAO.setSession(session);
+            transaction = session.beginTransaction();
+            userList = userDAO.findByFollowedAndUnFollowedUser(userId);
+            transaction.commit();
             return userList;
         } catch (Exception e) {
             transaction.rollback();

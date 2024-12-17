@@ -167,7 +167,7 @@
                         <content>
                           <AnchorPane fx:id="notifiMainAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <ScrollPane fx:id="scrallpaneNotifi" layoutX="29.0" layoutY="25.0" prefHeight="397.0" prefWidth="1106.0" />
+                                    <ScrollPane fx:id="scrollpaneListOfUsers" layoutX="29.0" layoutY="25.0" prefHeight="397.0" prefWidth="1106.0" />
                                  </children></AnchorPane>
                         </content>
                       </Tab>

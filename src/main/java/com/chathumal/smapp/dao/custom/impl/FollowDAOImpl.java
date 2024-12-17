@@ -3,6 +3,7 @@ package com.chathumal.smapp.dao.custom.impl;
 import com.chathumal.smapp.dao.CrudDAOImpl;
 import com.chathumal.smapp.dao.custom.FollowDAO;
 import com.chathumal.smapp.dto.FollowerDTO;
+import com.chathumal.smapp.dto.FollowingAndUnfollowingDTO;
 import com.chathumal.smapp.entity.Follow;
 import com.chathumal.smapp.entity.User;
 import com.chathumal.smapp.exception.NotFoundException;
