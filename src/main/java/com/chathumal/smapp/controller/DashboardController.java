@@ -1,6 +1,7 @@
 package com.chathumal.smapp.controller;
 
 import com.chathumal.smapp.HelloApplication;
+import com.chathumal.smapp.dto.FollowerDTO;
 import com.chathumal.smapp.entity.Content;
 import com.chathumal.smapp.entity.User;
 import com.chathumal.smapp.exception.DuplicateEntryException;
@@ -8,6 +9,7 @@ import com.chathumal.smapp.exception.ExceptionHandlerUtil;
 import com.chathumal.smapp.exception.NotFoundException;
 import com.chathumal.smapp.service.ServiceFactory;
 import com.chathumal.smapp.service.custom.ContentService;
+import com.chathumal.smapp.service.custom.FollowService;
 import com.chathumal.smapp.service.custom.UserService;
 import com.chathumal.smapp.service.custom.impl.ContentServiceImpl;
 import com.chathumal.smapp.util.AlertUtil;
@@ -29,6 +31,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -125,7 +128,7 @@ public class DashboardController {
                     rng.nextInt(256));
             //anchorPane.setStyle(style);
             anchorPane.setStyle("-fx-padding: 5px; -fx-border-color: #808080; -fx-border-radius: 3px; -fx-background-color: rgba(68,68,68,0.18)");
-            Label label = new Label(userList.get(i).getId()+" : "+userList.get(i).getName() +" : "+userList.get(i).getEmail());
+            Label label = new Label(userList.get(i).getId() + " : " + userList.get(i).getName() + " : " + userList.get(i).getEmail());
             anchorPane.setLeftAnchor(label, 5.0);
             anchorPane.setTopAnchor(label, 5.0);
 
@@ -192,10 +195,10 @@ public class DashboardController {
                                 boolean confirmUpdate = AlertUtil.showConfirmationAlert("Confirm", "Did you want to really update account");
                                 if (confirmUpdate) {
                                     try {
-                                        userService.updateUser(Integer.valueOf(txtId.getText()),txtName.getText(), txtAddress.getText(),
+                                        userService.updateUser(Integer.valueOf(txtId.getText()), txtName.getText(), txtAddress.getText(),
                                                 txtMobile.getText(), txtEmail.getText(), txtPassword.getText(), checkBox.isSelected());
 
-                                            AlertUtil.showInfoAlert("Success", "User update successful");
+                                        AlertUtil.showInfoAlert("Success", "User update successful");
 
 
                                     } catch (DuplicateEntryException e) {
@@ -208,7 +211,6 @@ public class DashboardController {
                                     AlertUtil.showErrorAlert("Failed", "Update failed");
                                 }
                             });
-
 
 
                             Scene popupScene = new Scene(gridPane, 400, 300);
@@ -282,50 +284,65 @@ public class DashboardController {
     }
 
     public void onChangeFollowingContent(Event event) {
-        System.out.println("Notification ON CHANGE");
+
+        scallpaneFollowdContent.setContent(null);
+        List<FollowerDTO> followerDTOS = null;
+        FollowService followService = (FollowService) ServiceFactory.getInstance().getService(ServiceFactory.Type.FOLLOW);
+        try {
+            followerDTOS = followService.findByFollower(UserSession.getInstance().getCurrentUser());
+            System.out.println("followService = " + followService);
+        } catch (NotFoundException e) {
+            AlertUtil.showErrorAlert("Not founded","Following content not found");
+        }
 
         VBox vBox = new VBox(20);
         final Random rng = new Random();
         scallpaneFollowdContent.setFitToWidth(true);
         scallpaneFollowdContent.setFitToHeight(true);
-        for (int i = 0; i < 10; i++) {
-            AnchorPane anchorPane = new AnchorPane();
-            String style = String.format("-fx-background: rgb(%d, %d, %d); " +
-                            "-fx-background-color: -fx-background;", rng.nextInt(256),
-                    rng.nextInt(256),
-                    rng.nextInt(256));
+        if (followerDTOS != null) {
+            for (int i = 0; i < followerDTOS.size(); i++) {
+                AnchorPane anchorPane = new AnchorPane();
+                String style = String.format("-fx-background: rgb(%d, %d, %d); " +
+                                "-fx-background-color: -fx-background;", rng.nextInt(256),
+                        rng.nextInt(256),
+                        rng.nextInt(256));
 
-            //anchorPane.setStyle(style);
-            anchorPane.setStyle("-fx-border-radius: 10px; -fx-padding: 30px;  " +
-                    "-fx-border-color: black; -fx-background-color: rgba(225,225,225,0.65)");
-            Label label = new Label("User " + (vBox.getChildren().size() + 1));
-            anchorPane.setLeftAnchor(label, 5.0);
-            anchorPane.setTopAnchor(label, 5.0);
-            AnchorPane.setTopAnchor(label, 50.0);
+                //anchorPane.setStyle(style);
+                anchorPane.setStyle("-fx-border-radius: 10px; -fx-padding: 30px;  " +
+                        "-fx-border-color: black; -fx-background-color: rgba(225,225,225,0.65)");
+                Label label = new Label("USER : " + followerDTOS.get(i).getUser_id() + "  " + followerDTOS.get(i).getContent());
+                anchorPane.setLeftAnchor(label, 5.0);
+                anchorPane.setTopAnchor(label, 5.0);
+                AnchorPane.setTopAnchor(label, 10.0);
+                anchorPane.setId(followerDTOS.get(i).getFid());
+                JFXButton button = new JFXButton("UnFollow");
+                button.setOnMouseClicked(mouseEvent -> {
+                    boolean confirmUnfollow = AlertUtil.showConfirmationAlert("Confirm", "Did you want to really unfollow this account");
+                    if (confirmUnfollow) {
+                        try {
+                            boolean b = followService.unfollowUser(Integer.valueOf(anchorPane.getId()));
+                            if (b) {
+                                AlertUtil.showInfoAlert("Success", "User Create successful");
+                            } else {
+                                AlertUtil.showWarningAlert("Failed", "User creation failed");
+                            }
+                        } catch (Exception e) {
+                            ExceptionHandlerUtil.handleException("Error", "An error occurred while updating the user profile", e);
+                        }
+                    } else {
+                        AlertUtil.showErrorAlert("Failed", "Update failed");
+                    }
+                });
 
-            Label address = new Label("Address " + (vBox.getChildren().size() + 1));
-            anchorPane.setLeftAnchor(address, 100.0);
-            anchorPane.setTopAnchor(address, 5.0);
+                button.setStyle("-fx-background-color: rgba(255,242,242,0.85); ");
+                AnchorPane.setRightAnchor(button, 30.0);
+                anchorPane.setTopAnchor(button, 10.0);
 
-            JFXButton button = new JFXButton();
-            if (i % 2 == 1) {
-                button.setText("Follow");
-            } else {
-                button.setText("Unfollow");
+                anchorPane.getChildren().addAll(label, button);
+                vBox.getChildren().add(anchorPane);
             }
-
-            button.setStyle("-fx-background-color: rgba(255,242,242,0.85); ");
-            button.setOnAction(evt -> {
-
-            });
-            AnchorPane.setRightAnchor(button, 30.0);
-            anchorPane.setTopAnchor(button, 40.0);
-
-            anchorPane.getChildren().addAll(label, address, button);
-            vBox.getChildren().add(anchorPane);
+            scallpaneFollowdContent.setContent(vBox);
         }
-        scallpaneFollowdContent.setContent(vBox);
-
     }
 
     public void onChangePost(Event event) {
