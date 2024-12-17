@@ -12,12 +12,10 @@ import com.chathumal.smapp.service.ServiceFactory;
 import com.chathumal.smapp.service.custom.ContentService;
 import com.chathumal.smapp.service.custom.FollowService;
 import com.chathumal.smapp.service.custom.UserService;
-import com.chathumal.smapp.service.custom.impl.ContentServiceImpl;
 import com.chathumal.smapp.util.AlertUtil;
 import com.chathumal.smapp.util.UserSession;
 import com.chathumal.smapp.util.ValidationUtil;
 import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXTextField;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -32,7 +30,6 @@ import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -46,7 +43,7 @@ public class DashboardController {
     public TextField txtUserId;
     public TextField txtPassword;
     public ScrollPane scrallpaneNotifi;
-    public AnchorPane notifiMainAnchorPane;
+    public AnchorPane anchorPaneUserList;
     public ScrollPane scallpaneFollowdContent;
     public Button btnUpdate;
     public Label lblIsAdmin;
@@ -63,7 +60,7 @@ public class DashboardController {
     public TextArea txtCreatePost;
     public ScrollPane scrollPanePost;
     public ScrollPane scrollPaneAllUsers;
-    public ScrollPane scrollpaneListOfUsers;
+    public ScrollPane scrollPaneListOfUsers;
     UserService userService = (UserService) ServiceFactory.getInstance().getService(ServiceFactory.Type.USER);
 
     public void imgLogoutOnClick(MouseEvent mouseEvent) {
@@ -250,9 +247,13 @@ public class DashboardController {
         txtPassword.setText(user.getPassword());
     }
 
-    public void notificationOnChange(Event event) {
+    public void userListOnChange(Event event) {
+        listOfAllUsersUserTab();
+    }
 
-        scrollpaneListOfUsers.setContent(null);
+
+    public void listOfAllUsersUserTab(){
+        scrollPaneListOfUsers.setContent(null);
         List<FollowingAndUnfollowingDTO> followerDTOS = null;
         UserService userService = (UserService) ServiceFactory.getInstance().getService(ServiceFactory.Type.USER);
         FollowService followService = (FollowService) ServiceFactory.getInstance().getService(ServiceFactory.Type.FOLLOW);
@@ -262,12 +263,10 @@ public class DashboardController {
             AlertUtil.showErrorAlert("Not founded","Following content not found");
         }
 
-
-
         VBox vBox = new VBox(20);
         final Random rng = new Random();
-        scrollpaneListOfUsers.setFitToWidth(true);
-        scrollpaneListOfUsers.setFitToHeight(true);
+        scrollPaneListOfUsers.setFitToWidth(true);
+        scrollPaneListOfUsers.setFitToHeight(true);
         if (followerDTOS != null) {
             for (int i = 0; i < followerDTOS.size(); i++) {
                 AnchorPane anchorPane = new AnchorPane();
@@ -295,8 +294,14 @@ public class DashboardController {
                         if (confirmUpdate) {
                             User byEmail = userService.findByEmail(anchorPane.getId());
                             if (byEmail != null) {
-                                boolean b = followService.addFollow(UserSession.getInstance().getCurrentUser(), byEmail);
-                                AlertUtil.showInfoAlert("Saved","Saved Success");
+                                if (button.getText().equalsIgnoreCase("Unfollow")){
+
+                                    AlertUtil.showInfoAlert("Saved","Saved Success");
+                                } else {
+                                    boolean b = followService.addFollow(UserSession.getInstance().getCurrentUser(), byEmail);
+                                    AlertUtil.showInfoAlert("Saved","Saved Success");
+                                }
+                                listOfAllUsersUserTab();
                             }
                         }
                     } catch (Exception e) {
@@ -309,10 +314,10 @@ public class DashboardController {
                 anchorPane.getChildren().addAll(label, button);
                 vBox.getChildren().add(anchorPane);
             }
-            scrollpaneListOfUsers.setContent(vBox);
+            scrollPaneListOfUsers.setContent(vBox);
         }
-
     }
+
 
     public void onChangeFollowingContent(Event event) {
 
