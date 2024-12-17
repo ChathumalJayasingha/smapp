@@ -409,10 +409,25 @@ public class DashboardController {
             Label address = new Label(content.get(i).getContent() + (vBox.getChildren().size() + 1));
             anchorPane.setLeftAnchor(address, 100.0);
             anchorPane.setTopAnchor(address, 5.0);
-
+            anchorPane.setId(String.valueOf(content.get(i).getCid()));
             JFXButton button = new JFXButton("Remove");
             button.setStyle("-fx-background-color: white");
-            button.setOnAction(evt -> vBox.getChildren().remove(anchorPane));
+            button.setOnAction(event -> {
+                boolean confirmUpdate = AlertUtil.showConfirmationAlert("Confirm", "Did you want to really delete this content");
+                if (confirmUpdate) {
+                    try {
+                        boolean b = contentService.deleteContent(Integer.valueOf(anchorPane.getId()));
+                        if (b) {
+                            AlertUtil.showInfoAlert("Success","Content delete success");
+                        } else {
+                            AlertUtil.showErrorAlert("Failed","Content delete failed");
+                        }
+                        loadPersonPost();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
             AnchorPane.setRightAnchor(button, 5.0);
             anchorPane.setTopAnchor(button, 5.0);
             anchorPane.setBottomAnchor(button, 5.0);

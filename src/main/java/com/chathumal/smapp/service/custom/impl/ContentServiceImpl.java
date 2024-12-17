@@ -53,7 +53,7 @@ public class ContentServiceImpl implements ContentService {
             List<Content> all = contentDAO.getAll();
             for (int i = 0; i < all.size(); i++) {
                 Content content = all.get(i);
-                boolean equals = content.getUser().getId()==(user.getId());
+                boolean equals = content.getUser().getId() == (user.getId());
                 if (equals) contents.add(content);
             }
             return contents;
@@ -64,5 +64,26 @@ public class ContentServiceImpl implements ContentService {
             session.close();
         }
         return null;
+    }
+
+    @Override
+    public boolean deleteContent(Integer cid) throws Exception {
+        ContentDAO contentDAO = (ContentDAO) DAOFactory.getInstance().getDAO(DAOFactory.Type.CONTENT);
+        Session session = FactoryConfiguration.getInstance().getSession();
+        contentDAO.setSession(session);
+        List<Content> contents = new ArrayList<>();
+        Transaction transaction = null;
+        try {
+            transaction = session.beginTransaction();
+            contentDAO.delete(cid);
+            transaction.commit();
+            return true;
+        } catch (Exception t) {
+            transaction.rollback();
+            t.printStackTrace();
+        } finally {
+            session.close();
+        }
+        return false;
     }
 }

@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ContentService {
     boolean addContent(User user, String content) throws Exception;
-
     List<Content> findContent(User user) throws Exception;
+    boolean deleteContent(Integer cid) throws Exception;
 
 }
