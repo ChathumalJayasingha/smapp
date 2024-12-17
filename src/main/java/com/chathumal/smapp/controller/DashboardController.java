@@ -255,6 +255,7 @@ public class DashboardController {
         scrollpaneListOfUsers.setContent(null);
         List<FollowingAndUnfollowingDTO> followerDTOS = null;
         UserService userService = (UserService) ServiceFactory.getInstance().getService(ServiceFactory.Type.USER);
+        FollowService followService = (FollowService) ServiceFactory.getInstance().getService(ServiceFactory.Type.FOLLOW);
         try {
             followerDTOS = userService.findByFollowedAndUnFollowedUser(String.valueOf(UserSession.getInstance().getCurrentUser().getId()));
         } catch (NotFoundException e) {
@@ -279,6 +280,7 @@ public class DashboardController {
                 anchorPane.setLeftAnchor(label, 5.0);
                 anchorPane.setTopAnchor(label, 5.0);
                 JFXButton button = new JFXButton();
+                anchorPane.setId(String.valueOf(followerDTOS.get(i).getEmail()));
                 String following = followerDTOS.get(i).getFollowing();
 
                 if (following.equalsIgnoreCase("true")){
@@ -288,7 +290,18 @@ public class DashboardController {
                 }
                 button.setStyle("-fx-background-color: white");
                 button.setOnMouseClicked(mouseEvent -> {
-
+                    try {
+                        boolean confirmUpdate = AlertUtil.showConfirmationAlert("Confirm", "Did you want to really follow account");
+                        if (confirmUpdate) {
+                            User byEmail = userService.findByEmail(anchorPane.getId());
+                            if (byEmail != null) {
+                                boolean b = followService.addFollow(UserSession.getInstance().getCurrentUser(), byEmail);
+                                AlertUtil.showInfoAlert("Saved","Saved Success");
+                            }
+                        }
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
                 });
                 AnchorPane.setRightAnchor(button, 5.0);
                 anchorPane.setTopAnchor(button, 5.0);

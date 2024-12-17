@@ -66,4 +66,27 @@ public class FollowServiceImpl implements FollowService {
         }
         return false;
     }
+
+    @Override
+    public boolean addFollow(User following, User follower) throws Exception {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = FactoryConfiguration.getInstance().getSession();
+            followDAO.setSession(session);
+            transaction = session.beginTransaction();
+            Follow follow = new Follow();
+            follow.setFlwusr(following);
+            follow.setUser(follower);
+            followDAO.add(follow);
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            transaction.rollback();
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+        return false;
+    }
 }
