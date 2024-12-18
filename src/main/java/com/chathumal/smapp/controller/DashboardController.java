@@ -295,8 +295,8 @@ public class DashboardController {
                             User byEmail = userService.findByEmail(anchorPane.getId());
                             if (byEmail != null) {
                                 if (button.getText().equalsIgnoreCase("Unfollow")){
-
-                                    AlertUtil.showInfoAlert("Saved","Saved Success");
+                                    boolean b = followService.deleteFollow(UserSession.getInstance().getCurrentUser(), byEmail);
+                                    AlertUtil.showInfoAlert("Delete","Delete Success");
                                 } else {
                                     boolean b = followService.addFollow(UserSession.getInstance().getCurrentUser(), byEmail);
                                     AlertUtil.showInfoAlert("Saved","Saved Success");

@@ -39,4 +39,20 @@ public class FollowDAOImpl extends CrudDAOImpl<Follow, Integer> implements Follo
         }
 
     }
+
+    @Override
+    public boolean deleteFollow(User following, User follower) throws Exception {
+        try {
+            String sql = "delete from follow where flwr_id=:followerId and user_id=:userId";
+            NativeQuery nativeQuery = session.createNativeQuery(sql);
+            nativeQuery.setParameter("followerId", following.getId());
+            nativeQuery.setParameter("userId", follower.getId());
+            int rowsAffected = nativeQuery.executeUpdate();
+            System.out.println("Rows affected: " + rowsAffected);
+            return true;
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            return false;
+        }
+    }
 }

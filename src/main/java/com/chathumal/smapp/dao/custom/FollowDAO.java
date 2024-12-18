@@ -12,5 +12,7 @@ import java.util.List;
 
 public interface FollowDAO extends CrudDAO<Follow,Integer> {
     List<FollowerDTO> findByFollower(User user) throws NotFoundException;
+    boolean deleteFollow(User following,User follower) throws Exception;
+
 
 }
